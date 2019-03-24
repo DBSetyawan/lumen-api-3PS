@@ -13,7 +13,8 @@ class CorsMiddleware
     private $allowedHeaders = [
         'Content-Type',
         'Authorization',
-        'X-Requested-With'
+        'X-Requested-With',
+        'X-3PERMATA-X'
     ];
 
     /**
