@@ -28,7 +28,7 @@ class AuthController extends Controller
      */
     public function getUser()
     {
-        return response()->json(['data' => Auth::user()]);
+        return response()->json(['data' => Auth::User()]);
     }
 
     /**
@@ -39,14 +39,14 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
-
+        
         $token = Auth::attempt($credentials);
 
         if (!$token) {
-            return response()->json(['message' => trans('messages.login_failed')], 401);
+            return response()->json(['message' => trans('messages.login_gagal')], 401);
         }
 
-        return response()->json(['data' => ['user' => Auth::user(), 'token' => $token]]);
+        return response()->json(['data' => ['name' => Auth::user(), 'token_register' => $token]]);
     }
 
     /**

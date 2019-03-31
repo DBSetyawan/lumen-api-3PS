@@ -33,8 +33,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $hidden = [
         'password',
-        'verified',
-        'verification_token',
+        'email_verified_at',
+        'token_register',
         'roles'
     ];
     
@@ -70,7 +70,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         $user->name = $name;
         $user->email = $email;
         $user->password = Hash::make($password);
-        $user->verification_token = Str::random(64);
+        $user->token_register = Str::random(64);
 
         return $user->save() ? $user : false;
     }
@@ -94,7 +94,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public static function verifyByToken($token)
     {
-        $user = (new static)->where(['verification_token' => $token, 'verified' => 0])->first();
+        $user = (new static)->where(['token_register' => $token, 'email_verified_at' !== NULL])->first();
 
         if (!$user) {
             return false;
@@ -106,14 +106,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     }
 
     /**
-     * Verifiy a user
+     * Verifiy a userq
      *
      * @return bool
      */
     public function verify()
     {
-        $this->verification_token = null;
-        $this->verified = 1;
+        $this->token_register = null;
+        $this->verified = '';
 
         return $this->save();
     }
@@ -125,9 +125,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         $token = Str::random(64);
 
-        $created = DB::table('password_resets')->updateOrInsert(
+        $created = DB::table('users')->updateOrInsert(
             ['email' => $this->email],
-            ['email' => $this->email, 'token' => $token]
+            ['email' => $this->email, 'token_register' => $token]
         );
 
         return $created ? $token : false;
@@ -140,9 +140,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @param $password
      * @return false|User
      */
-    public static function newPasswordByResetToken($token, $password)
+    public static function newPasswordByResetToken($token_register, $password)
     {
-        $query = DB::table('password_resets')->where(compact('token'));
+        $query = DB::table('users')->where(compact('token_register'));
         $record = $query->first();
 
         if (!$record) {

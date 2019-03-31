@@ -8,9 +8,13 @@ $router->get('/', function () {
     return response()->json(['message' => 'Welcome to Lumen API Starter']);
 });
 
+
 /* Auth Routes */
 $router->group(['prefix' => 'auth', 'as' => 'auth'], function (Router $router) {
-
+    $router->get('/testdb', function (Request $request) use ($router) {
+        $users = app('db')->select("SELECT * FROM users");    
+        return response()->json($users);
+    });
     /* Defaults */
     $router->post('/register', [
         'as' => 'register',
